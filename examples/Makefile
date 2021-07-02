@@ -1,7 +1,9 @@
 CC=gcc
 CFLAGS=-g -Wall -D_GNU_SOURCE -D_DEFAULT_SOURCE -I../
 LIBS=-lncurses -ltinfo
-BINS=twinkle
+
+SRCS=$(wildcard *.c)
+BINS=$(patsubst %.c, %, $(SRCS))
 
 all: $(BINS)
 
