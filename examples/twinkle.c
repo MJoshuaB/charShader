@@ -1,5 +1,5 @@
 /***********************\
-* twinke.c              *
+*       twinke.c        *
 * A smalll example file *
 * for charsl.h          *
 \***********************/
