@@ -1,18 +1,47 @@
- /***************************\
- *         Header File       *
- \***************************/
+ /*********************\
+ **     <charsl.h>    **
+ ** a shadertoy style **
+ ** shader sandbox    **
+ \*********************/
 
 #ifndef CHARSL_H
 #define CHARSL_H
 
 // TODO:
-// texture(Sampler2D texture, vec2 uv)
-// texelFetch(Sampler2D texture, ivec2 fragCoord)
-//            ^~~~~~~~~~~~~~~~^
-// would there be other textures?
-// do I need a Sampler2D struct?
+//
+// WINDOW is a curses struct
+// texture(WINDOW *window, vec2 uv)
+// texelFetch(WINDOW *window, ivec2 fragCoord)
+// chtype mvwinch(WINDOW *window, int y, int x)
+//
+// WINDOW *newpad(int nlines, int ncols);
 //
 // void onKeyPressed(); // called when there are keypresses in the buffer
+//
+// struct vec2
+// struct ivec2
+// struct Texture2D
+//
+// void fragment(void);
+// float fract(float a);
+// char texture(Texture2D *texture, vec2 uv);
+// char texelFetch(Texture2D *texture, ivec2 fragCoord);
+// Sampler2D *loadTexture(const char *fileName);
+// void unloadTexture(Sampler2D *texture);
+//
+// ???????????? Maybe ????????????????
+//
+// void mainImage();
+// void bufferA();
+// void bufferB();
+// void bufferC();
+// void bufferD();
+//
+// WINDOW *main
+// WINDOW *bufferA
+// WINDOW *bufferB
+// WINDOW *bufferC
+// WINDOW *bufferD
 
 #include <curses.h>
 
@@ -27,29 +56,47 @@ typedef struct {
 	int y;
 } ivec2;
 
+typedef struct {
+	int nrows;
+	int ncols;
+	WINDOW *buffer;
+} Texture2D;
+
 
 // Global variables
 int   FRAMECOUNT;        // number of frames since start
-float TIME;              // time since start
+float TIME;              // time since start -------------------------------------- NOT IMPLEMENTED
 char  CHAR;              // char at position
 vec2  UV;                // [0.0..1.0] uv coords of the character
 ivec2 FRAGCOORD;         // integer offset from the top-left of the window
 ivec2 RESOLUTION;        // resolution of the screen in chars
+Texture2D TEXTURE;       // Screen Texture
 
+// ---------------------------
 // Method definitions
+// ---------------------------
+
+// Methods to override
 void fragment(void);
 
+// Math functions
 float fract(float a);
 
+// Texture functions
 char texture(vec2 uv); // returns char at nearest fragCoord
-char texelFetch(ivec2 fragCoord); // returns char at fragCoord
+char texelFetch(Texture2D texture, ivec2 fragCoord); // returns char at fragCoord
+Texture2D *loadTexture(const char *fileName);
+void unloadTexture(Texture2D texture);
 
 //=-------------=//
 // Main function //
 //=-------------=//
 int main(void) {
 	// setup curses
-	initscr();
+	WINDOW *mainWindow = initscr();
+	TEXTURE.ncols = COLS;
+	TEXTURE.nrows = LINES;
+	TEXTURE.buffer = mainWindow;
 	cbreak();
 	noecho();
 	curs_set(0); // make cursor invisible
@@ -57,6 +104,7 @@ int main(void) {
 
 	clear();
 
+	FRAMECOUNT = 0;
 	RESOLUTION.x = COLS;
 	RESOLUTION.y = LINES;
 
@@ -94,9 +142,9 @@ char texture(vec2 uv) {
 	// return the character nearest the uv point
 	return 'X';
 }
-char texelFetch(ivec2 fragCoord) {
+char texelFetch(Texture2D texture, ivec2 fragCoord) {
 	// return the character at the fragCoord
-	return 'X';
+	return (char)(mvwinch(texture.buffer, fragCoord.y, fragCoord.x) & A_CHARTEXT);
 }
 
 #endif // ifndef CHARSL_H
