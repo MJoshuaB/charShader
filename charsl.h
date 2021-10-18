@@ -67,7 +67,7 @@ typedef struct
 
 // Global variables
 int FRAMECOUNT;		 // number of frames since start
-double TIME;			 // time since start -------------------------------------- NOT IMPLEMENTED
+double TIME;			 // time since start -------------------------------------- NOT IMPLEMENTED perhaps time.h::clock()
 char CHAR;				 // char at position
 vec2 UV;					 // [0.0..1.0] uv coords of the character
 ivec2 FRAGCOORD;	 // integer offset from the top-left of the window
@@ -85,7 +85,7 @@ void fragment(void);
 float fract(float a);
 
 // Texture functions
-char texture(vec2 uv);															 // returns char at nearest fragCoord
+char texture(Texture2D texture, vec2 uv);						 // returns char at nearest fragCoord
 char texelFetch(Texture2D texture, ivec2 fragCoord); // returns char at fragCoord
 Texture2D *loadTexture(const char *fileName);
 void unloadTexture(Texture2D texture);
@@ -145,7 +145,7 @@ float fract(float a)
 	return a - (int)a;
 }
 
-char texture(vec2 uv)
+char texture(Texture2D texture, vec2 uv)
 {
 	// return the character nearest the uv point
 	return 'X';
