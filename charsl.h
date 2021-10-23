@@ -155,7 +155,7 @@ char texelFetch(Texture2D texture, ivec2 fragCoord)
 	// check that fragCoord is in texture
 	if (fragCoord.x < 0 || fragCoord.x > texture.ncols || fragCoord.y < 0 || fragCoord.y > texture.nrows)
 	{
-		return NULL;
+		return ' ';
 	}
 	// return the character at the fragCoord
 	return (char)(mvwinch(texture.buffer, fragCoord.y, fragCoord.x) & A_CHARTEXT);
