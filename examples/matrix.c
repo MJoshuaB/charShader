@@ -13,7 +13,7 @@ void fragment()
 {
   if (FRAGCOORD.y == 0)
   {
-    if (CHAR == ' ' && rand() % 10 == 0) {
+    if (CHAR == ' ' && rand() % 15 == 0) {
       CHAR = alphanum[rand() % 62];
     }
     else if (CHAR != ' ' && rand() % 8 == 0) {

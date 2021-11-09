@@ -11,4 +11,4 @@ all: $(BINS)
 	$(CC) $(CFLAGS) $^ $(LIBS) -o $@
 
 clean:
-	$(RM) $(BINS)
+	find . -type f -executable -delete

@@ -7,5 +7,7 @@ Functions much like shadertoy
 
 ### Examples:
 - twinkle; spots appear and fade over time
+- snow; spots fall down the screen
+- matrix; classic letter-rain effect
 
 # License (GNU GPL v3.0)
