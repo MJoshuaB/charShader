@@ -1,8 +1,8 @@
 /*********************\
- **     <charsl.h>    **
- ** a shadertoy style **
- ** shader sandbox    **
- \*********************/
+**     <charsl.h>    **
+** a shadertoy style **
+** shader sandbox    **
+\*********************/
 
 #ifndef CHARSL_H
 #define CHARSL_H
@@ -44,6 +44,7 @@
 // WINDOW *bufferD
 
 #include <curses.h>
+#include <time.h>
 
 // Type definitions
 typedef struct
@@ -67,7 +68,7 @@ typedef struct
 
 // Global variables
 int FRAMECOUNT;		 // number of frames since start
-double TIME;			 // time since start -------------------------------------- NOT IMPLEMENTED perhaps time.h::clock()
+double TIME;			 // time since start ----- NOT IMPLEMENTED perhaps time.h:clock_gettime()
 char CHAR;				 // char at position
 vec2 UV;					 // [0.0..1.0] uv coords of the character
 ivec2 FRAGCOORD;	 // integer offset from the top-left of the window
@@ -95,6 +96,8 @@ void unloadTexture(Texture2D texture);
 //=-------------=//
 int main(void)
 {
+	struct timespec START, CURRENT;
+	clock_gettime(CLOCK_REALTIME, &START);
 	// setup curses
 	initscr();
 	TEXTURE.ncols = COLS;
@@ -115,6 +118,8 @@ int main(void)
 	while (getch() != 'q')
 	{ // quit when 'q' key is pressed; maybe ESC?
 		// update
+		clock_gettime(CLOCK_REALTIME, &CURRENT);
+		TIME = (CURRENT.tv_sec - START.tv_sec) + (CURRENT.tv_nsec - START.tv_nsec) * 1e-9;
 		for (int y = 0; y < LINES; y++)
 		{
 			for (int x = 0; x < COLS; x++)
