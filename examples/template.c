@@ -6,9 +6,9 @@
 
 #include "../charsl.h"
 
-char shades[] = " .-:*+=%#@";
+char shades[] = "   ...',;:clodxkO0KXNWM";
 
 void fragment(void)
 {
-	CHAR = shades[(int)(UV.x * 10)];
+	CHAR = shades[(int)(UV.x * 23)];
 }

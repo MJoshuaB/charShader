@@ -14,7 +14,7 @@
 // texelFetch(WINDOW *window, ivec2 fragCoord)
 // chtype mvwinch(WINDOW *window, int y, int x)
 //
-// WINDOW *newpad(int nlines, int ncols);
+// WINDOW *newpad(int height, int width);
 //
 // void onKeyPressed(); // called when there are keypresses in the buffer
 //
@@ -23,11 +23,13 @@
 // struct Texture2D
 //
 // void fragment(void);
+//
 // float fract(float a);
+//
 // char texture(Texture2D *texture, vec2 uv);
 // char texelFetch(Texture2D *texture, ivec2 fragCoord);
-// Sampler2D *loadTexture(const char *fileName);
-// void unloadTexture(Sampler2D *texture);
+// Texture2D *loadTexture(const char *fileName);
+// void unloadTexture(Texture2D *texture);
 //
 // ???????????? Maybe ????????????????
 //
@@ -61,14 +63,14 @@ typedef struct
 
 typedef struct
 {
-	int nrows;
-	int ncols;
+	int width;
+	int height;
 	WINDOW *buffer;
 } Texture2D;
 
 // Global variables
 int FRAMECOUNT;		 // number of frames since start
-double TIME;			 // time since start ----- NOT IMPLEMENTED perhaps time.h:clock_gettime()
+double TIME;			 // time since start
 char CHAR;				 // char at position
 vec2 UV;					 // [0.0..1.0] uv coords of the character
 ivec2 FRAGCOORD;	 // integer offset from the top-left of the window
@@ -80,7 +82,9 @@ Texture2D TEXTURE; // Screen Texture
 // ---------------------------
 
 // Methods to override
+void setup(void); // TODO ---------------- Implement this for loading textures
 void fragment(void);
+// void cleanup(void); // Maybe this won't be needed
 
 // Math functions
 float fract(float a);
@@ -100,8 +104,8 @@ int main(void)
 	clock_gettime(CLOCK_REALTIME, &START);
 	// setup curses
 	initscr();
-	TEXTURE.ncols = COLS;
-	TEXTURE.nrows = LINES;
+	TEXTURE.width = COLS;
+	TEXTURE.height = LINES;
 	TEXTURE.buffer = curscr;
 	cbreak();
 	noecho();
@@ -153,12 +157,16 @@ float fract(float a)
 char texture(Texture2D texture, vec2 uv)
 {
 	// return the character nearest the uv point
-	return 'X';
+	if (uv.x < 0.0 || uv.x > 1.0 || uv.y < 0.0 || uv.y > 1.0)
+	{
+		return ' ';
+	}
+	return (char)(mvwinch(texture.buffer, (int)(uv.y * texture.height), (int)(uv.x * texture.width)) & A_CHARTEXT);
 }
 char texelFetch(Texture2D texture, ivec2 fragCoord)
 {
 	// check that fragCoord is in texture
-	if (fragCoord.x < 0 || fragCoord.x > texture.ncols || fragCoord.y < 0 || fragCoord.y > texture.nrows)
+	if (fragCoord.x < 0 || fragCoord.x > texture.width || fragCoord.y < 0 || fragCoord.y > texture.height)
 	{
 		return ' ';
 	}
