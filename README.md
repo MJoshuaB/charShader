@@ -14,5 +14,6 @@ Functions much like shadertoy
 - checker; simple checkerboard test pattern
 - rand; simple PRNG test
 - cogol; Conway's Game of Life as a shader
+- elementary; an elementary cellular automaton
 
 # License (GNU GPL v3.0)
