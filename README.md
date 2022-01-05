@@ -13,5 +13,6 @@ Functions much like shadertoy
 - matrix; classic letter-rain effect
 - checker; simple checkerboard test pattern
 - rand; simple PRNG test
+- cogol; Conway's Game of Life as a shader
 
 # License (GNU GPL v3.0)

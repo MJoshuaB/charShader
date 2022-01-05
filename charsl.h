@@ -45,8 +45,9 @@
 // WINDOW *bufferC
 // WINDOW *bufferD
 
-#include <curses.h>
 #include <time.h>
+
+#include <curses.h>
 
 // Type definitions
 typedef struct
