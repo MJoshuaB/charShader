@@ -5,6 +5,7 @@ Functions much like shadertoy
 - header file with the basic types, functions, and defines for simple GLSL style shaders
 - Implement a shadertoy style interface.
 - Implement a mode with color
+- Make command line arguments available to shaders
 
 ### Examples:
 - time; a simple usage of the TIME variable

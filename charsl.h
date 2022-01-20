@@ -9,28 +9,6 @@
 
 // TODO:
 //
-// WINDOW is a curses struct
-// texture(WINDOW *window, vec2 uv)
-// texelFetch(WINDOW *window, ivec2 fragCoord)
-// chtype mvwinch(WINDOW *window, int y, int x)
-//
-// WINDOW *newpad(int height, int width);
-//
-// void onKeyPressed(); // called when there are keypresses in the buffer
-//
-// struct vec2
-// struct ivec2
-// struct Texture2D
-//
-// void fragment(void);
-//
-// float fract(float a);
-//
-// char texture(Texture2D *texture, vec2 uv);
-// char texelFetch(Texture2D *texture, ivec2 fragCoord);
-// Texture2D *loadTexture(const char *fileName);
-// void unloadTexture(Texture2D *texture);
-//
 // ???????????? Maybe ????????????????
 //
 // void mainImage();
@@ -45,9 +23,20 @@
 // WINDOW *bufferC
 // WINDOW *bufferD
 
+#include <stdlib.h>
+#include <stdio.h>
 #include <time.h>
 
 #include <curses.h>
+
+// Enums
+enum WRAP_OPTS {
+	WRAP_NONE,
+	WRAP_X,
+	WRAP_Y,
+	WRAP_BOTH,
+	WRAP_STRETCH
+};
 
 // Type definitions
 typedef struct
@@ -67,16 +56,17 @@ typedef struct
 	int width;
 	int height;
 	WINDOW *buffer;
+	enum WRAP_OPTS wrap; // TODO: implement texture wrapping
 } Texture2D;
 
 // Global variables
-int FRAMECOUNT;		 // number of frames since start
-double TIME;			 // time since start
-char CHAR;				 // char at position
-vec2 UV;					 // [0.0..1.0] uv coords of the character
-ivec2 FRAGCOORD;	 // integer offset from the top-left of the window
-ivec2 RESOLUTION;	 // resolution of the screen in chars
-Texture2D TEXTURE; // Screen Texture
+int FRAMECOUNT;			// number of frames since start
+double TIME;				// time since start
+char CHAR;					// char at position
+vec2 UV;						// [0.0..1.0] uv coords of the character
+ivec2 FRAGCOORD;		// integer offset from the top-left of the window
+ivec2 RESOLUTION;		// resolution of the screen in chars
+Texture2D TEXTURE;	// Screen Texture
 
 // ---------------------------
 // Method definitions
@@ -90,11 +80,14 @@ void fragment(void);
 // Math functions
 float fract(float a);
 
-// Texture functions
-char texture(Texture2D texture, vec2 uv);						 // returns char at nearest fragCoord
-char texelFetch(Texture2D texture, ivec2 fragCoord); // returns char at fragCoord
-Texture2D *loadTexture(const char *fileName);
-void unloadTexture(Texture2D texture);
+// Texture sampling
+char texture(Texture2D texture, vec2 uv);							// returns char at nearest fragCoord
+char texelFetch(Texture2D texture, ivec2 fragCoord);	// returns char at fragCoord
+// Texture loading
+Texture2D loadTexture(const char *fileName);					// TODO
+void unloadTexture(Texture2D texture);								// TODO
+// Texture configuration
+void setTextureWrap(Texture2D texture, int wrap);			// TODO: add wrap field to Texture2D struct
 
 //=-------------=//
 // Main function //
@@ -108,10 +101,10 @@ int main(void)
 	TEXTURE.width = COLS;
 	TEXTURE.height = LINES;
 	TEXTURE.buffer = curscr;
-	cbreak();
-	noecho();
-	curs_set(0); // make cursor invisible
-	timeout(0);	 // make getch non-blocking
+	cbreak();			// make input immediate
+	noecho();			// don't echo keypresses
+	curs_set(0);	// make cursor invisible
+	timeout(0);		// make getch non-blocking
 
 	clear();
 
@@ -119,10 +112,12 @@ int main(void)
 	RESOLUTION.x = COLS;
 	RESOLUTION.y = LINES;
 
+	// TODO: run shader setup
+	// setup();
+
 	// run loop
 	while (getch() != 'q')
 	{ // quit when 'q' key is pressed; maybe ESC?
-		// update
 		clock_gettime(CLOCK_REALTIME, &CURRENT);
 		TIME = (CURRENT.tv_sec - START.tv_sec) + (CURRENT.tv_nsec - START.tv_nsec) * 1e-9;
 		for (int y = 0; y < LINES; y++)
@@ -155,12 +150,14 @@ float fract(float a)
 	return a - (int)a;
 }
 
+// TODO: add sampling flags for wrapping, blank, smear
+
 char texture(Texture2D texture, vec2 uv)
 {
 	// return the character nearest the uv point
 	if (uv.x < 0.0 || uv.x > 1.0 || uv.y < 0.0 || uv.y > 1.0)
 	{
-		return ' ';
+		return ' '; // should probably return something more useful
 	}
 	return (char)(mvwinch(texture.buffer, (int)(uv.y * texture.height), (int)(uv.x * texture.width)) & A_CHARTEXT);
 }
@@ -173,6 +170,51 @@ char texelFetch(Texture2D texture, ivec2 fragCoord)
 	}
 	// return the character at the fragCoord
 	return (char)(mvwinch(texture.buffer, fragCoord.y, fragCoord.x) & A_CHARTEXT);
+}
+
+Texture2D loadTexture(const char *filename)
+{
+	// read file into buffer
+	char *buffer;
+	FILE *fh = fopen(filename, "rb");
+	long s;
+	if (fh != NULL)
+	{
+		fseek(fh, 0, SEEK_END);
+		s = ftell(fh);
+		rewind(fh);
+		buffer = malloc(s);
+		if (buffer != NULL)
+		{
+			fread(buffer, s, 1, fh);
+			fclose(fh);
+			fh = NULL;
+		}
+		if (fh != NULL)
+		{
+			fclose(fh);
+			fh = NULL;
+		}
+	}
+	// get width and height of texture
+	unsigned int width;
+	unsigned int height;
+	// create Texture2D struct
+	Texture2D newTexture;
+	// return pointer to Texture2D
+	newTexture.width = 1;
+	newTexture.height = 1;
+	// create curses pad
+	newTexture.buffer = newpad(newTexture.height, newTexture.width); // WINDOW *newpad(int lines, int cols);
+	// copy buffer to pad
+	// free file buffer
+	free(buffer);
+	return newTexture;
+}
+
+void unloadTexture(Texture2D texture)
+{
+	// free texture data
 }
 
 #endif // ifndef CHARSL_H

@@ -4,8 +4,6 @@
 * as a shader           *
 \***********************/
 
-#include <stdlib.h>
-
 #include "../charsl.h"
 
 void fragment(void)
@@ -16,7 +14,6 @@ void fragment(void)
 	}
 	else
 	{
-		// TODO implement generation logic
 		ivec2 lookup;
 		int n = 0;
 		for (int dy = -1; dy < 2; dy++)

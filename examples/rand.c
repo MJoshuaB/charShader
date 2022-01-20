@@ -7,14 +7,10 @@
 
 #include "../charsl.h"
 
-int random(int n)
-{
-	return (n * 75 + 74) % 25537;
-}
-
 void fragment(void)
 {
-	if (FRAGCOORD.y > random(FRAGCOORD.x) % RESOLUTION.y)
+	srand(FRAGCOORD.x);
+	if (FRAGCOORD.y > rand() % RESOLUTION.y)
 	{
 		CHAR = '#';
 	}

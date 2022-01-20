@@ -4,7 +4,6 @@
 * for charsl.h          *
 \***********************/
 
-#include <stdlib.h>
 #include "../charsl.h"
 
 char shades[] = " .-:*+=%#@";
