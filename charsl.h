@@ -73,7 +73,7 @@ Texture2D TEXTURE;	// Screen Texture
 // ---------------------------
 
 // Methods to override
-void setup(void); // TODO ---------------- Implement this for loading textures
+void setup(void);
 void fragment(void);
 // void cleanup(void); // Maybe this won't be needed
 
@@ -112,8 +112,9 @@ int main(void)
 	RESOLUTION.x = COLS;
 	RESOLUTION.y = LINES;
 
-	// TODO: run shader setup
-	// setup();
+#ifdef RUN_SETUP
+	setup();
+#endif
 
 	// run loop
 	while (getch() != 'q')
@@ -197,16 +198,47 @@ Texture2D loadTexture(const char *filename)
 		}
 	}
 	// get width and height of texture
-	unsigned int width;
-	unsigned int height;
+	int width = 0;
+	int height = 0;
+	int cur_width = 0;
+	for (int i = 0; i < s; i++)
+	{
+		if (buffer[i] == '\n')
+		{
+			if (cur_width > width)
+			{
+				width = cur_width;
+			}
+			height++;
+			cur_width = 0;
+		}
+		else if (buffer[i] != '\r')
+		{
+			cur_width++;
+		}
+	}
 	// create Texture2D struct
 	Texture2D newTexture;
 	// return pointer to Texture2D
-	newTexture.width = 1;
-	newTexture.height = 1;
+	newTexture.width = width;
+	newTexture.height = height;
 	// create curses pad
 	newTexture.buffer = newpad(newTexture.height, newTexture.width); // WINDOW *newpad(int lines, int cols);
 	// copy buffer to pad
+	int x = 0, y = 0;
+	for (int j = 0; j < s; j++)
+	{
+		if (buffer[j] == '\n')
+		{
+			y++;
+			x = 0;
+		}
+		else if (buffer[j] != '\r')
+		{
+			mvwaddch(newTexture.buffer, y, x, buffer[j]);
+			x++;
+		}
+	}
 	// free file buffer
 	free(buffer);
 	return newTexture;
