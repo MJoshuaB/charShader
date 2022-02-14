@@ -11,11 +11,11 @@ Texture2D text;
 
 void setup(void)
 {
-	text = loadTexture("./text");
+	text = loadTexture("./text.txt");
 }
 
 
 void fragment(void)
 {
-	CHAR = texelFetch(text, FRAGCOORD);
+	CHAR = texture(text, UV);
 }

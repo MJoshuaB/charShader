@@ -84,7 +84,7 @@ float fract(float a);
 char texture(Texture2D texture, vec2 uv);							// returns char at nearest fragCoord
 char texelFetch(Texture2D texture, ivec2 fragCoord);	// returns char at fragCoord
 // Texture loading
-Texture2D loadTexture(const char *fileName);					// TODO
+Texture2D loadTexture(const char *fileName);
 void unloadTexture(Texture2D texture);								// TODO
 // Texture configuration
 void setTextureWrap(Texture2D texture, int wrap);			// TODO: add wrap field to Texture2D struct
@@ -165,7 +165,7 @@ char texture(Texture2D texture, vec2 uv)
 char texelFetch(Texture2D texture, ivec2 fragCoord)
 {
 	// check that fragCoord is in texture
-	if (fragCoord.x < 0 || fragCoord.x > texture.width || fragCoord.y < 0 || fragCoord.y > texture.height)
+	if (fragCoord.x < 0 || fragCoord.x >= texture.width || fragCoord.y < 0 || fragCoord.y >= texture.height)
 	{
 		return ' ';
 	}
@@ -173,6 +173,7 @@ char texelFetch(Texture2D texture, ivec2 fragCoord)
 	return (char)(mvwinch(texture.buffer, fragCoord.y, fragCoord.x) & A_CHARTEXT);
 }
 
+// TODO: return as a pointer
 Texture2D loadTexture(const char *filename)
 {
 	// read file into buffer
